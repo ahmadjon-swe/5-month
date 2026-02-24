@@ -4,7 +4,7 @@ const BookSchema = require("../schema/book.schema")
 // get_all ////////////////////////////////////////////////////////////////////////////////////
 const getAllBooks = async (req, res) => {
   try {
-    const books = await BookSchema.find()
+    const books = await BookSchema.find().populate("authorInfo", "-_id fullname period work")
 
     if(!books){
       return res.status(404).json({
@@ -25,7 +25,7 @@ const getAllBooks = async (req, res) => {
 const getOneBook = async (req, res) => {
   try {
     const reqID = req.params.id
-    const book = await BookSchema.findById(reqID)
+    const book = await BookSchema.findById(reqID).populate("authorInfo")
 
     if(!book){
       return res.status(404).json({
@@ -45,15 +45,15 @@ const getOneBook = async (req, res) => {
 // add ////////////////////////////////////////////////////////////////////////////////////
 const addBook = async (req, res) => {
   try {
-    const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl}= req.body
+    const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo}= req.body
 
-    if(!title || !pages || !publishedYear || !publishedHome || !period || !description || !genre || !imageUrl){
+    if(!title || !pages || !publishedYear || !publishedHome || !period || !description || !genre || !imageUrl || !authorInfo){
       return res.status(400).json({
         message: "all fields must be filled in"
       })
     }
 
-    await BookSchema.create({title, pages, publishedYear, publishedHome, period, description, genre, imageUrl})
+    await BookSchema.create({title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo})
 
     res.status(201).json({
       message: "added new book"
@@ -70,7 +70,7 @@ const addBook = async (req, res) => {
 const updateBook = async (req, res) => {
   try {
     const reqID = req.params.id
-    const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl}= req.body
+    const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo}= req.body
 
     const book = await BookSchema.findById(reqID)
 
@@ -80,7 +80,7 @@ const updateBook = async (req, res) => {
       })
     }
     
-    await BookSchema.findByIdAndUpdate(reqID, {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl})
+    await BookSchema.findByIdAndUpdate(reqID, {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo})
 
     res.status(201).json({
       message: "updated book"

@@ -1,55 +1,64 @@
+const CustomErrorHandler = require("../error/custom-error.handler")
 const AuthorSchema = require("../schema/author.schema")
 
 // get_all ////////////////////////////////////////////////////////////////////////////////////
-const getAllAuthors = async (req, res) => {
+const getAllAuthors = async (req, res, next) => {
   try {
     const authors = await AuthorSchema.find()
 
     if(!authors){
-      return res.status(404).json({
-        message: "404 authors are not found"
-      })
+      throw CustomErrorHandler.NotFound("404 authors are not found")
     }
 
     res.status(200).json(authors)
   } catch (error) {
-    res.status(500).json({
-      message: error.message
+    next(error)
+  }
+}
+
+// search ////////////////////////////////////////////////////////////////////////////////////
+const search = async (req, res, next) => {
+  try {
+    const {searchingValue} = req.query
+    const result = await AuthorSchema.find({
+      fullname: {$regex: searchingValue, $options: "i"}
     })
+
+    if(!result.length){
+      throw CustomErrorHandler.NotFound("404 authors are not found")
+    }
+
+    res.status(200).json(result)
+  } catch (error) {
+    next(error)
   }
 }
 
 
 // get_one ////////////////////////////////////////////////////////////////////////////////////
-const getOneAuthor = async (req, res) => {
+const getOneAuthor = async (req, res, next) => {
   try {
     const reqID = req.params.id
     const author = await AuthorSchema.findById(reqID)
 
     if(!author){
-      return res.status(404).json({
-        message: "404 author is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 authors are not found")
     }
 
     res.status(200).json(author)
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // add ////////////////////////////////////////////////////////////////////////////////////
-const addAuthor = async (req, res) => {
+const addAuthor = async (req, res, next) => {
   try {
     const {fullname, birthDate, deathDate, period, bio, work, imageUrl}= req.body
 
     if(!fullname || !birthDate || !deathDate || !period || !bio || !work || !imageUrl){
-      return res.status(400).json({
-        message: "all fields must be filled in"
-      })
+      throw CustomErrorHandler.BadRequest("all fields must be filled in")
     }
 
     await AuthorSchema.create({fullname, birthDate, deathDate, period, bio, work, imageUrl})
@@ -58,15 +67,13 @@ const addAuthor = async (req, res) => {
       message: "added new author"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // update ////////////////////////////////////////////////////////////////////////////////////
-const updateAuthor = async (req, res) => {
+const updateAuthor = async (req, res, next) => {
   try {
     const reqID = req.params.id
     const {fullname, birthDate, deathDate, period, bio, work, imageUrl}= req.body
@@ -74,9 +81,7 @@ const updateAuthor = async (req, res) => {
     const author = await AuthorSchema.findById(reqID)
 
     if(!author){
-      return res.status(404).json({
-        message: "404 author is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 authors are not found")
     }
     
     await AuthorSchema.findByIdAndUpdate(reqID, {fullname, birthDate, deathDate, period, bio, work, imageUrl})
@@ -85,24 +90,20 @@ const updateAuthor = async (req, res) => {
       message: "updated author"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // delete ////////////////////////////////////////////////////////////////////////////////////
-const deleteAuthor = async (req, res) => {
+const deleteAuthor = async (req, res, next) => {
   try {
     const reqID = req.params.id
 
     const author = await AuthorSchema.findById(reqID)
 
     if(!author){
-      return res.status(404).json({
-        message: "404 author is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 authors are not found")
     }
 
     await AuthorSchema.findByIdAndDelete(reqID)
@@ -111,9 +112,7 @@ const deleteAuthor = async (req, res) => {
       message: "deleted author"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
@@ -124,5 +123,6 @@ module.exports = {
   getOneAuthor,
   addAuthor,
   updateAuthor,
-  deleteAuthor
+  deleteAuthor,
+  search
 }
