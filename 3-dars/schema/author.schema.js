@@ -14,14 +14,13 @@ const Author = new Schema({
     type: Date,
     required: true,
     min: new Date("1370-01-01"),
-    max: new Date()
+    max: Date.now
   },
   deathDate: {
     type: String,
     required: true,
-    match: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
     validate: {
-      validator: (v)=> v === "hayot" || new Date(v) < new Date(),
+      validator: ((v)=> v === "hayot" || new Date(v) < new Date() && /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(v)),
       message: "deathDate kelajakda bo'lolmaydi!"
     }
   },

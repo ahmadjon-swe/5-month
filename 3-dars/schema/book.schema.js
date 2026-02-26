@@ -18,7 +18,7 @@ const Book = new Schema({
     type: Date,
     required: true,
     min: new Date("1900-01-01"),
-    max: new Date()
+    max: Date.now
   },
   publishedHome: {
     type: String,

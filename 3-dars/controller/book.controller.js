@@ -1,56 +1,47 @@
+const CustomErrorHandler = require("../error/custom-error.handler")
 const BookSchema = require("../schema/book.schema")
 
 
 // get_all ////////////////////////////////////////////////////////////////////////////////////
-const getAllBooks = async (req, res) => {
+const getAllBooks = async (req, res, next) => {
   try {
     const books = await BookSchema.find().populate("authorInfo", "-_id fullname period work")
 
     if(!books){
-      return res.status(404).json({
-        message: "404 books are not found"
-      })
+      throw CustomErrorHandler.NotFound("404 books are not found")
     }
 
     res.status(200).json(books)
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // get_one ////////////////////////////////////////////////////////////////////////////////////
-const getOneBook = async (req, res) => {
+const getOneBook = async (req, res, next) => {
   try {
     const reqID = req.params.id
     const book = await BookSchema.findById(reqID).populate("authorInfo")
 
     if(!book){
-      return res.status(404).json({
-        message: "404 book is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 book is not found")
     }
 
     res.status(200).json(book)
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // add ////////////////////////////////////////////////////////////////////////////////////
-const addBook = async (req, res) => {
+const addBook = async (req, res, next) => {
   try {
     const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo}= req.body
 
     if(!title || !pages || !publishedYear || !publishedHome || !period || !description || !genre || !imageUrl || !authorInfo){
-      return res.status(400).json({
-        message: "all fields must be filled in"
-      })
+      throw CustomErrorHandler.BadRequest("all fields must be filled in")
     }
 
     await BookSchema.create({title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo})
@@ -59,15 +50,13 @@ const addBook = async (req, res) => {
       message: "added new book"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // update ////////////////////////////////////////////////////////////////////////////////////
-const updateBook = async (req, res) => {
+const updateBook = async (req, res, next) => {
   try {
     const reqID = req.params.id
     const {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo}= req.body
@@ -75,9 +64,7 @@ const updateBook = async (req, res) => {
     const book = await BookSchema.findById(reqID)
 
     if(!book){
-      return res.status(404).json({
-        message: "404 book is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 book is not found")
     }
     
     await BookSchema.findByIdAndUpdate(reqID, {title, pages, publishedYear, publishedHome, period, description, genre, imageUrl, authorInfo})
@@ -86,24 +73,20 @@ const updateBook = async (req, res) => {
       message: "updated book"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
 
 // delete ////////////////////////////////////////////////////////////////////////////////////
-const deleteBook = async (req, res) => {
+const deleteBook = async (req, res, next) => {
   try {
     const reqID = req.params.id
 
     const book = await BookSchema.findById(reqID)
 
     if(!book){
-      return res.status(404).json({
-        message: "404 book is not found"
-      })
+      throw CustomErrorHandler.NotFound("404 book is not found")
     }
 
     await BookSchema.findByIdAndDelete(reqID)
@@ -112,9 +95,7 @@ const deleteBook = async (req, res) => {
       message: "deleted book"
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
