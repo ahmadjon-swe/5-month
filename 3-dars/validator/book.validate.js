@@ -2,7 +2,7 @@ const joi = require("joi");
 
 const bookValidator = (data) => {
   const schema = joi.object({
-    title: joi.string().min(3).max(40).pattern(new RegExp(/^[a-zA-Z0-9\s\-\']+$/)).required(),
+    title: joi.string().min(3).max(40).pattern(new RegExp(/^[a-zA-Z0-9\s\-'?,.()]+$/)).required(),
     pages: joi.number().integer().min(5).max(1500).required(),
     publishedYear: joi.date().min("1900-01-01").less("now").required(),
     publishedHome: joi.string().required(),

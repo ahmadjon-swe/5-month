@@ -6,7 +6,7 @@ const Book = new Schema({
     required: true,
     minLength: 3,
     maxLength: 40,
-    match: /^[a-zA-Z0-9\s\-\']+$/,
+    match: /^[a-zA-Z0-9\s\-'?,.()]+$/,
   },
   pages: {
     type: Number,

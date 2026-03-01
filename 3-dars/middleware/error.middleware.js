@@ -1,7 +1,7 @@
 const CustomErrorHandler = require("../error/custom-error.handler")
 
+// next nega kerak, yoki endi kelamizmi u yerga?
 module.exports = function(err, req, res, next){
-  try {
     if(err instanceof CustomErrorHandler){
       return res.status(err.status || 400).json({
         message: err.message,
@@ -18,14 +18,14 @@ module.exports = function(err, req, res, next){
         errors: ValidationErrors
       })
     }else if(err.name = "ValidationsError"){
+      console.log(err)
       return res.status(400).json({
         errName: "ValidationsError",
         errors: err.message
       })
     }
-
     
-  } catch (error) {
-    return res.status(500).json({message: error.message, name: error.name})
-  }
+    console.log(err)
+    return res.status(500).json({message: err.message, name: err.name})
+
 }

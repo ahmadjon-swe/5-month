@@ -6,7 +6,7 @@ const Author = new Schema({
     required: true,
     minLength: 3,
     maxLength: 40,
-    match: /^[a-zA-Z\s\-\']+$/,
+    match: /^[a-zA-Z0-9\s\-'?,.()]+$/,
     // birinchi harfni kattalashtiriadi:
     set: (v)=> v.trim().split(" ").map(str=>str[0].toUpperCase()+str.slice(1)).join(" ")
   },

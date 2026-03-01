@@ -2,7 +2,7 @@ const joi = require("joi");
 
 const authorValidator = (data) => {
   const schema = joi.object({
-    fullname: joi.string().min(3).max(40).pattern(new RegExp(/^[a-zA-Z\s\-\']+$/)).required(),
+    fullname: joi.string().min(3).max(40).pattern(new RegExp(/^[a-zA-Z0-9\s\-'?,.()]+$/)).required(),
     birthDate: joi.date().min("1370-01-01").less("now").required(),
     deathDate: joi.string().required(),
     period: joi.string().valid("Temuriylar davri", "Sovet davri", "Jadid davri", "Mustaqillik davri").required(),

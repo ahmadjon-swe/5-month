@@ -10,7 +10,13 @@ const Auth = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
     match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  },
+  password: {
+    type: String,
+    required: true,
+    min: 6
   },
   role: {
     type: String,
@@ -23,6 +29,9 @@ const Auth = new Schema({
   otpTime: {
     type: Number,
     required: true
+  },
+  refreshToken: {
+    type: String
   }
 }, {
   versionKey: false,
