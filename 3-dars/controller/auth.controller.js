@@ -57,12 +57,11 @@ const verify = async (req, res, next) => {
       throw CustomErrorHandler.UnAuthorithed("otp expired")
     }
 
-    await AuthSchema.findByIdAndUpdate(foundedEmail._id, {otp: "", otpTime: 0})
     
     const accessToken = access_token({id: foundedEmail._id, role: foundedEmail.role, email: foundedEmail.email}) 
     const refreshToken = refresh_token({id: foundedEmail._id, role: foundedEmail.role, email: foundedEmail.email}) 
-
-    await AuthSchema.findByIdAndUpdate(foundedEmail._id, {refreshToken})
+    
+    await AuthSchema.findByIdAndUpdate(foundedEmail._id, {otp: "", otpTime: 0, refreshToken})
 
     res.cookie("refresh_token", 
       refreshToken, {
@@ -118,7 +117,7 @@ const login = async (req, res, next) => {
 // LOGOUT ///////////////////////////////////////////////////////////////////////////////////
 const logout = async (req, res, next) => {
   try {
-    const foundedEmail = await req["user"].email
+    const foundedEmail = req["user"].email
 
     if(!foundedEmail){
       throw CustomErrorHandler.NotFound("user not found")
@@ -135,6 +134,26 @@ const logout = async (req, res, next) => {
     next(error)
   }
 }
+
+
+// LOGOUT PRO ///////////////////////////////////////////////////////////////////////////////////
+
+// Buyam bo'ladimi? cookie yordamida logout qilish
+const logoutPro = async (req, res, next) => {
+  try {
+    const foundedEmail = req.cookies.refresh_token
+
+    if(!foundedEmail){
+      throw CustomErrorHandler.BadRequest("Already logged out")
+    }
+
+    await AuthSchema.findByIdAndUpdate(foundedEmail._id, {refreshToken: ""})
+    res.clearCookie("refresh_token")
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 // VERIFY & DELETE ///////////////////////////////////////////////////////////////////////////////////
 const verifyAndDelete = async (req, res, next) => {
